@@ -1,0 +1,34 @@
+{
+  "name": "dustlight",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20.19"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "check": "eslint . && vite build --mode check --outDir .tmp/check-build --emptyOutDir",
+    "shot": "node tools/shot.mjs",
+    "assets": "python tools/fetch_assets.py && python tools/fetch_audio.py && python tools/fetch_room_cabin.py && python tools/fetch_room_bookshop.py && python tools/fetch_room_pottery.py && python tools/fetch_room_castle.py && python tools/fetch_room_cyber.py"
+  },
+  "dependencies": {
+    "n8ao": "2.0.1",
+    "postprocessing": "6.39.5",
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@gltf-transform/core": "^4.5.1",
+    "@gltf-transform/extensions": "^4.5.1",
+    "@gltf-transform/functions": "^4.5.1",
+    "eslint": "^10.11.0",
+    "globals": "^17.12.0",
+    "meshoptimizer": "^1.3.0",
+    "pngjs": "^7.0.0",
+    "puppeteer-core": "^24.0.0",
+    "sharp": "^0.35.5",
+    "vite": "^6.0.0"
+  }
+}

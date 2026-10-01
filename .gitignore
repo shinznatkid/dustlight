@@ -1,0 +1,10 @@
+node_modules/
+dist/
+# CC0 Poly Haven downloads (~64 MB) - regenerate with `npm run assets`
+public/assets/
+# screenshot loop output; only the approved look references are tracked
+shots/*
+!shots/_final.jpg
+!shots/_compare.jpg
+.tmp/
+__pycache__/

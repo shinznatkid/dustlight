@@ -1,0 +1,43 @@
+[
+  {
+    "id": "meadow", "room": "meadow", "time": 0.9, "wall": "#c98f6f", "fire": true, "journal": "samples/meadow-journal.json",
+    "cam": { "pos": [7.2, 5.2, 7.7], "look": [-0.4, 0.8, -0.35], "fov": 28 },
+    "layout": {
+      "sofa_03": [-0.8, 0, 0.45, 1.571, 0],
+      "throw_pillows_01": [-0.929, 0.46, 0.294, 1.571, 0],
+      "coffee_table_round_01": [0.5, 0, 0.45, 0, 0],
+      "tea_set_01": [0.353, 0.4, 0.294, 0.35, 0],
+      "mid_century_lounge_chair": [-2.2, 0, 1.35, 1.047, 0],
+      "Ottoman_01": [1.05, 0, -0.75, -0.349, 0],
+      "ArmChair_01": [1.8, 0, -0.2, -1.92, 0],
+      "side_table_01": [-0.8, 0, -1.4, 1.571, 0],
+      "standing_picture_frame_01": [-0.903, 0.55, -1.539, 1.271, 0],
+      "wooden_bookshelf_worn": [1.4, 0, -2.3, 0, 0],
+      "book_encyclopedia_set_01": [1.036, 1.277, -2.28, 0, 0],
+      "book_encyclopedia_set_01#2": [1.706, 0.672, -2.28, 0, 0],
+      "book_encyclopedia_set_01#3": [1.764, 1.663, -2.319, 3.142, 0],
+      "book_encyclopedia_set_01#4": [1.056, 0.392, -2.28, 0, 0],
+      "wicker_basket_01": [1.72, 0.96, -2.3, 0.1, 0],
+      "potted_plant_04": [0.95, 0.96, -2.292, 0, 0],
+      "ceramic_vase_01": [0.92, 1.663, -2.3, 0, 0],
+      "boombox": [1.749, 1.277, -2.288, -0.08, 0],
+      "book_encyclopedia_set_01#5": [1.131, 2.063, -2.282, 0, 0],
+      "potted_plant_01": [-2.796, 0, -2.182, 0.349, 0],
+      "wicker_basket_01#2": [0.32, 0, -1.62, 0.349, 0],
+      "hanging_picture_frame_02": [-0.9, 1.6, -2.151, 0, 0],
+      "hanging_picture_frame_01": [-3.182, 1.18, 0.05, 1.571, 0],
+      "fancy_picture_frame_01": [-3.178, 1.318, -2.2, 1.571, 0],
+      "mantel_clock_01": [-0.9, 1.18, -2.08, 0, 0],
+      "ceramic_vase_01#2": [-0.28, 1.18, -2.08, 0, 0],
+      "potted_plant_04#2": [-1.5, 1.18, -2.072, 0, 0],
+      "lamp:floor": [-2.75, 0, 2.25, 0, 0],
+      "lamp:table": [-0.75, 0.55, -1.3, 3.142, 0],
+      "lamp:candles": [0.77, 0.402, 0.67, 0, 0]
+    }
+  },
+  { "id": "cabin", "room": "cabin", "time": 0.9, "fire": true, "journal": "samples/cabin-journal.json" },
+  { "id": "bookshop", "room": "bookshop", "time": 0.8, "journal": "samples/bookshop-journal.json" },
+  { "id": "pottery", "room": "pottery", "time": 0.9, "fire": true, "journal": "samples/pottery-journal.json" },
+  { "id": "castle", "room": "castle", "time": 0.66, "fire": true, "journal": "samples/castle-journal.json" },
+  { "id": "cyber", "room": "cyber", "time": 0.92, "fire": true, "wall": "#c9b7e1", "journal": "samples/cyber-journal.json", "cam": { "pos": [7.2, 5.2, 7.7], "look": [-0.4, 0.9, -0.4], "fov": 28 } }
+]

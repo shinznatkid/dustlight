@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ห้องฟังเสียง — Dustlight</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22%3E%3Ccircle cx=%228%22 cy=%228%22 r=%226%22 fill=%22%23f2b56b%22/%3E%3C/svg%3E" />
+  <!-- Sound board: every game sound next to alternatives, to compare by ear and pick (src/soundboard.js).
+       Dev only; http://127.0.0.1:5190/sounds.html -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600&family=Mali:wght@500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* the game's own tokens (index.html) */
+    :root {
+      --glass: rgba(28, 22, 18, 0.5);
+      --glass-strong: rgba(30, 23, 18, 0.78);
+      --glass-edge: rgba(255, 240, 220, 0.14);
+      --ink: #f6ecdf;
+      --ink-dim: rgba(246, 236, 223, 0.62);
+      --ink-faint: rgba(246, 236, 223, 0.4);
+      --accent: #f2b56b;
+      --accent-ink: #2b1d10;
+      --display: 'Mali', 'IBM Plex Sans Thai', system-ui, sans-serif;
+      --soft: #9fd07a;
+      --dull: #93a9c9;
+      --bright: #f2b56b;
+      --harsh: #ef8b76;
+      --band0: #7d6a5a; --band1: #c79a6b; --band2: #f2b56b; --band3: #fbe3b8;
+    }
+    * { box-sizing: border-box; }
+    html { background: #2a241f; }
+    body {
+      margin: 0; min-height: 100vh; color: var(--ink); -webkit-font-smoothing: antialiased;
+      font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; font-size: 14px; line-height: 1.5;
+      background:
+        radial-gradient(1100px 520px at 12% -8%, rgba(242, 181, 107, 0.16), transparent 62%),
+        radial-gradient(900px 480px at 105% 8%, rgba(150, 110, 160, 0.13), transparent 58%),
+        #2a241f;
+      background-attachment: fixed;
+    }
+    button { font: inherit; color: inherit; }
+    [hidden] { display: none !important; }
+    a { color: var(--accent); }
+    .glass {
+      background: var(--glass); border: 1px solid var(--glass-edge);
+      backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+    }
+    .btn {
+      font-size: 14px; padding: 8px 14px; border-radius: 12px; cursor: pointer; white-space: nowrap;
+      border: 1px solid var(--glass-edge); background: rgba(255, 255, 255, 0.08); color: var(--ink);
+      transition: background 0.15s, transform 0.15s;
+    }
+    .btn:hover { background: rgba(255, 255, 255, 0.16); }
+    .btn:active { transform: scale(0.98); }
+    .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; font-weight: 600; }
+    .btn.primary:hover { background: #f6c283; }
+    .btn.small { font-size: 13px; padding: 6px 12px; }
+    .btn.on { background: var(--accent); color: var(--accent-ink); }
+    .btn small, .chk small { margin-left: 6px; color: var(--ink-dim); font-size: 11.5px; }
+    .btn.on small { color: var(--accent-ink); }
+    .en { color: var(--ink-dim); font-weight: 400; font-size: 0.78em; font-family: 'IBM Plex Sans Thai', system-ui, sans-serif; }
+
+    /* ---- top bar ---- */
+    .top {
+      position: sticky; top: 0; z-index: 10; display: flex; align-items: center; justify-content: space-between; gap: 10px 16px;
+      flex-wrap: wrap; padding: 10px 16px; border-radius: 0 0 18px 18px; background: var(--glass-strong); border-top: 0;
+    }
+    .brand { display: flex; align-items: baseline; gap: 10px; }
+    .brand .logo { font-family: var(--display); font-weight: 600; font-size: 20px; color: var(--accent); }
+    .brand small { margin-left: 6px; color: var(--ink-dim); font-size: 12px; }
+    .ctl { display: flex; align-items: center; gap: 8px 10px; flex-wrap: wrap; }
+    .pill { font-size: 12px; padding: 4px 10px; border-radius: 999px; background: rgba(239, 139, 118, 0.18); color: #ffd3c6; border: 1px solid rgba(239, 139, 118, 0.35); }
+    .pill.ok { background: rgba(159, 208, 122, 0.14); color: #d8f0c4; border-color: rgba(159, 208, 122, 0.35); }
+    .vol { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink-dim); }
+    .vol input { width: 120px; }
+    input[type=range] { accent-color: var(--accent); }
+
+    /* ---- page ---- */
+    .wrap { max-width: 1060px; margin: 0 auto; padding: 22px 16px 80px; }
+    .intro h1 { font-family: var(--display); font-weight: 600; font-size: clamp(26px, 4vw, 34px); margin: 8px 0 8px; color: var(--ink); }
+    .intro p { margin: 6px 0; color: var(--ink-dim); max-width: 780px; }
+    .intro b { color: var(--ink); }
+    .intro .legend { font-size: 12.5px; }
+    .intro .count { color: var(--accent); font-weight: 500; }
+    .intro .warn { color: #ffd3c6; background: rgba(239, 139, 118, 0.12); border: 1px solid rgba(239, 139, 118, 0.3); padding: 8px 12px; border-radius: 12px; }
+    .picks { margin: 12px 0; padding: 12px 14px; border-radius: 16px; }
+    .picks .msg { color: var(--accent); font-size: 13px; margin-bottom: 6px; }
+    .picks pre { margin: 0; max-height: 220px; overflow: auto; font-size: 12px; color: var(--ink); white-space: pre-wrap; }
+    nav.groups { display: flex; flex-wrap: wrap; gap: 6px; margin: 18px 0 8px; }
+    nav.groups a {
+      text-decoration: none; color: var(--ink); font-size: 13px; padding: 5px 12px; border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06); border: 1px solid var(--glass-edge);
+    }
+    nav.groups a:hover { background: rgba(255, 255, 255, 0.13); }
+    .group { margin-top: 30px; scroll-margin-top: 80px; }
+    .ghead { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin-bottom: 10px; }
+    .ghead h2 { font-family: var(--display); font-weight: 600; font-size: 24px; margin: 0; }
+    .ghead .note { flex-basis: 100%; margin: 0; font-size: 12.5px; color: var(--ink-dim); }
+
+    /* ---- a row: one game action ---- */
+    .row { border-radius: 20px; padding: 14px 16px 12px; margin-bottom: 12px; scroll-margin-top: 80px; }
+    .row.changed { border-color: rgba(242, 181, 107, 0.45); }
+    .row header h3 { font-size: 16px; font-weight: 600; margin: 0; }
+    .row .when { margin: 2px 0 0; font-size: 12.5px; color: var(--ink-dim); }
+    .row .where { display: block; margin-top: 3px; font-size: 11px; color: var(--ink-faint); font-family: ui-monospace, Consolas, monospace; overflow-wrap: anywhere; }
+    .opts { list-style: none; margin: 10px 0 0; padding: 0; display: grid; gap: 6px; }
+    .opt {
+      display: grid; grid-template-columns: 38px minmax(0, 1fr) minmax(0, 270px) 34px; align-items: center; gap: 4px 12px;
+      padding: 7px 8px 7px 8px; border-radius: 14px; background: rgba(255, 255, 255, 0.04); border: 1px solid transparent;
+    }
+    .opt.current { background: rgba(255, 255, 255, 0.07); }
+    .opt.picked { border-color: rgba(242, 181, 107, 0.6); background: rgba(242, 181, 107, 0.1); }
+    .opt.sel .play { box-shadow: 0 0 0 2px rgba(242, 181, 107, 0.55); }
+    .opt .name { min-width: 0; }
+    .opt .name b { font-weight: 500; }
+    .opt.current .name b { color: var(--accent); font-weight: 600; }
+    .opt .new { display: inline-block; margin-right: 6px; padding: 0 7px; border-radius: 999px; font-size: 11px; font-weight: 600; background: var(--accent); color: var(--accent-ink); vertical-align: 1px; }
+    .opt .src { font-size: 11.5px; color: var(--ink-faint); overflow-wrap: anywhere; }
+    .opt .uses { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 4px; }
+    .chip {
+      font-size: 11.5px; padding: 2px 9px; border-radius: 999px; cursor: pointer;
+      border: 1px solid var(--glass-edge); background: rgba(255, 255, 255, 0.05); color: var(--ink-dim);
+    }
+    .chip:hover { background: rgba(255, 255, 255, 0.12); color: var(--ink); }
+    .chip.on { background: var(--accent); color: var(--accent-ink); }
+    .play {
+      width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: grid; place-items: center; padding: 0;
+      border: 1px solid rgba(242, 181, 107, 0.55); background: rgba(242, 181, 107, 0.1); color: var(--accent);
+      transition: background 0.12s, transform 0.12s;
+    }
+    .play::before { content: ''; width: 0; height: 0; border-left: 11px solid currentColor; border-top: 7px solid transparent; border-bottom: 7px solid transparent; margin-left: 3px; }
+    .play:hover { background: rgba(242, 181, 107, 0.22); }
+    .play:active { transform: scale(0.94); }
+    .play.on { background: var(--accent); color: var(--accent-ink); }
+    .kind-amb .play.on::before, .kind-music .play.on::before { border: 0; width: 11px; height: 11px; background: currentColor; margin: 0; border-radius: 2px; }
+    .star {
+      width: 34px; height: 34px; border-radius: 10px; cursor: pointer; font-size: 19px; line-height: 1; padding: 0;
+      border: 0; background: none; color: var(--ink-faint);
+    }
+    .star:hover { color: var(--accent); background: rgba(255, 255, 255, 0.06); }
+    .picked .star { color: var(--accent); }
+    .stats { display: flex; align-items: center; gap: 8px; font-size: 11.5px; color: var(--ink-dim); font-variant-numeric: tabular-nums; cursor: help; min-width: 0; }
+    .stats.none { color: var(--ink-faint); cursor: default; }
+    .stats .num { white-space: nowrap; min-width: 50px; }
+    .bands { display: inline-flex; width: 66px; height: 8px; border-radius: 4px; overflow: hidden; background: rgba(255, 255, 255, 0.06); flex: none; }
+    .bands.demo { vertical-align: middle; }
+    .bands i { display: block; height: 100%; }
+    .bands .b0 { background: var(--band0); } .bands .b1 { background: var(--band1); } .bands .b2 { background: var(--band2); } .bands .b3 { background: var(--band3); }
+    .tag { font-size: 11.5px; font-weight: 600; padding: 1px 8px; border-radius: 999px; white-space: nowrap; border: 1px solid currentColor; }
+    .tag.soft { color: var(--soft); } .tag.dull { color: var(--dull); } .tag.bright { color: var(--bright); } .tag.harsh { color: var(--harsh); }
+
+    /* ---- rub pad ---- */
+    .rubwrap { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 14px; align-items: center; margin-top: 10px; }
+    .pad {
+      position: relative; height: 104px; border-radius: 16px; cursor: grab; touch-action: none; user-select: none;
+      display: grid; place-items: center; text-align: center; color: var(--ink-dim); font-size: 13px;
+      border: 1px dashed rgba(242, 181, 107, 0.45);
+      background: repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.035) 0 10px, rgba(255, 255, 255, 0.01) 10px 20px);
+    }
+    .pad:active { cursor: grabbing; background-color: rgba(242, 181, 107, 0.06); }
+    .pad small { display: block; font-size: 11.5px; color: var(--ink-faint); }
+    .pad .meter { position: absolute; left: 12px; right: 12px; bottom: 10px; height: 5px; border-radius: 3px; background: rgba(255, 255, 255, 0.07); overflow: hidden; }
+    .pad .meter i { display: block; height: 100%; width: 0; background: var(--accent); }
+    .rubtools { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+    .chk { font-size: 13px; display: flex; align-items: center; gap: 6px; cursor: pointer; }
+    .chk input { accent-color: var(--accent); width: 16px; height: 16px; }
+
+    .credits { margin-top: 34px; border-radius: 20px; padding: 16px 18px; }
+    .credits h2 { font-family: var(--display); font-weight: 600; font-size: 20px; margin: 0 0 8px; }
+    .credits li, .credits p { font-size: 12.5px; color: var(--ink-dim); overflow-wrap: anywhere; }
+
+    @media (max-width: 720px) {
+      .opt { grid-template-columns: 38px minmax(0, 1fr) 34px; }
+      .opt .stats { grid-column: 2 / 3; grid-row: 2; flex-wrap: wrap; }
+      .opt .star { grid-column: 3; grid-row: 1; }
+      .rubwrap { grid-template-columns: 1fr; }
+      .rubtools { flex-direction: row; flex-wrap: wrap; }
+      .top { border-radius: 0 0 14px 14px; padding: 8px 12px; gap: 6px 10px; }
+      .brand .logo { font-size: 17px; }
+      .brand small, .vol span { display: none; }
+      .ctl { gap: 6px; }
+      .ctl .btn { font-size: 13px; padding: 6px 10px; }
+      .vol input { width: 76px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="board"></div>
+  <script type="module" src="/src/soundboard.js"></script>
+</body>
+</html>
