@@ -5,7 +5,7 @@
 // and fire → before / after → the timelapse from there (what the mouse did is in the
 // journal; the room comes back exactly as it was) → the places card says finished.
 // Screenshots → shots/p6-* (level 1) / shots/pt-<level>-* (the others).
-// Usage: node tools/playthrough.mjs [--level=cabin]   (exit code 1 if a check fails)
+// Usage: node tools/playthrough.mjs [--level=cabin] [--port=5190 | --base=<url>]   (exit code 1 if a check fails)
 // What each level does by mouse, and how the rest of its repairs are finished through
 // the systems, is in LEVELS below (world coordinates of that level's room).
 import './lowprio.mjs'; // below-normal priority for this and the browser it opens
@@ -25,6 +25,8 @@ const fails = [];
 const expect = (ok, what) => { if (!ok) fails.push(what); };
 const LEVEL = process.argv.slice(2).find((a) => a.startsWith('--level='))?.slice(8) ?? 'meadow';
 const PORT = process.argv.slice(2).find((a) => a.startsWith('--port='))?.slice(7) ?? '5190';
+// --base=<url>: another server than the local one, e.g. the published site (https://…/dustlight/)
+const BASE = process.argv.slice(2).find((a) => a.startsWith('--base='))?.slice(7) ?? `http://127.0.0.1:${PORT}/`;
 // per level: tool-key strokes by mouse (world points; key = the tool bar's number), the
 // repairs left finished through the systems (in the page), the fireplace logs to click
 // by hand, the first two things out of the furniture box and where to put them, and the
@@ -180,9 +182,9 @@ const shot = (n) => `${OUT}${LV.shots}-${n}.png`;
     page.on('pageerror', (e) => errors.push(e.message));
     // (console.warn arrives as type 'warn'; ANGLE's shader-compiler notes are harmless)
     page.on('console', (m) => { if (['error', 'warn', 'warning'].includes(m.type()) && !/Program Info Log/.test(m.text())) errors.push(`${m.type()}: ${m.text()}`); });
-    await page.goto(`http://127.0.0.1:${PORT}/?pr=1&play`, { waitUntil: 'load' });
+    await page.goto(`${BASE}?pr=1&play`, { waitUntil: 'load' });
     await page.evaluate(() => localStorage.clear());
-    await page.goto(`http://127.0.0.1:${PORT}/?pr=1&play&phase=restore&level=${LEVEL}`, { waitUntil: 'load' });
+    await page.goto(`${BASE}?pr=1&play&phase=restore&level=${LEVEL}`, { waitUntil: 'load' });
     await page.waitForFunction('window.__ready === true', { timeout: 240000 });
     await sleep(1500);
     const scr = (x, y, z) => page.evaluate((x, y, z) => {
