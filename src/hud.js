@@ -120,7 +120,12 @@ export function createHud({ getGame, onTool, onFinish = () => {} }) {
       const h = Array.isArray(hk) ? t(hk[0], hk[1]) : t(hk);
       if (h !== lastHint) {
         lastHint = h;
-        $('hint').textContent = h;
+        // the first clause apart: a narrow window shows only that, on one line (index.html)
+        const cut = h.indexOf(' · ');
+        const rest = document.createElement('span');
+        rest.className = 'rest';
+        rest.textContent = cut < 0 ? '' : h.slice(cut);
+        $('hint').replaceChildren(cut < 0 ? h : h.slice(0, cut), rest);
       }
     },
     tick(dt) {

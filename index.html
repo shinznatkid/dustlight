@@ -188,6 +188,29 @@
     .credits p, .credits li { font-size: 12.5px; color: var(--ink-dim); line-height: 1.55; margin: 0; }
     .credits ul { padding-left: 18px; margin: 0; }
     .credits a { color: var(--ink); }
+    kbd { display: inline-block; min-width: 20px; padding: 1px 6px; margin: 0 1px; border-radius: 6px; border: 1px solid rgba(255,240,220,0.3); border-bottom-width: 2px; background: rgba(255,255,255,0.08); font: 600 11.5px/1.5 'IBM Plex Sans Thai', system-ui, sans-serif; text-align: center; color: var(--ink); }
+    .modal .row .foot { margin-right: auto; align-self: center; font-size: 12px; color: var(--ink-dim); }
+    /* how to play: the controls sheet (ui/help.js) */
+    /* (2 × 2: each row stays on one line — four columns broke Thai words mid-way) */
+    .modal.help { width: min(760px, calc(100vw - 32px)); }
+    .help .cols { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .help .col { border-radius: 16px; padding: 12px 16px 10px; background: rgba(255,255,255,0.04); border: 1px solid var(--glass-edge); }
+    .help .col h4 { display: flex; justify-content: space-between; align-items: center; min-height: 34px; font-family: var(--display); font-size: 16px; font-weight: 600; margin: 0 0 4px; color: var(--accent); }
+    .help .col .r { display: flex; justify-content: space-between; align-items: baseline; gap: 14px; font-size: 13.5px; line-height: 1.5; padding: 4px 0; white-space: nowrap; }
+    .help .col .r .k { color: var(--ink); }
+    .help .col .r .d { color: var(--ink-dim); text-align: right; }
+    .help .mouse { width: 24px; height: 34px; border-radius: 12px; border: 1.5px solid rgba(255,240,220,0.45); position: relative; overflow: hidden; flex: none; }
+    .help .mouse i { position: absolute; top: 0; width: 50%; height: 14px; }
+    .help .mouse .lb { left: 0; background: rgba(242,181,107,0.6); }
+    .help .mouse .rb { right: 0; background: rgba(140,180,255,0.5); }
+    .help .mouse .wh { left: 50%; top: 4px; width: 3px; height: 7px; margin-left: -1.5px; border-radius: 2px; background: #fff; }
+    @media (max-width: 620px) { .help .cols { grid-template-columns: 1fr; } .help .col .r { white-space: normal; } }
+    /* the first-time welcome card */
+    .modal.welcome { width: min(460px, calc(100vw - 32px)); }
+    .welcome ol { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+    .welcome li { display: grid; grid-template-columns: 34px 1fr; gap: 12px; align-items: start; font-size: 14px; color: var(--ink-dim); line-height: 1.55; }
+    .welcome li .i { width: 34px; height: 34px; border-radius: 11px; background: rgba(242,181,107,0.2); display: grid; place-items: center; font-size: 18px; }
+    .welcome li b { color: var(--ink); font-weight: 600; }
 
     /* ---- in-game HUD ---- */
     #hud .loc { position: absolute; left: 16px; top: 16px; padding: 10px 16px 11px; border-radius: 16px; }
@@ -195,7 +218,14 @@
     #hud .loc .room { font-size: 12px; color: var(--ink-dim); }
     #hud .tr { position: absolute; right: 16px; top: 16px; display: flex; gap: 8px; }
     #hud .hint { position: absolute; right: 16px; bottom: 16px; font-size: 12px; color: var(--ink-dim); padding: 8px 12px; border-radius: 12px; max-width: min(420px, calc(50vw - 60px)); line-height: 1.5; }
-    @media (max-width: 900px) { #hud .hint { display: none; } }
+    /* a narrow window: the hint's first clause on one line, over the tool bar (and over the
+       paint colours while they show) */
+    @media (max-width: 900px) {
+      #hud .hint { right: auto; left: 50%; transform: translateX(-50%); bottom: 84px; max-width: calc(100vw - 32px); padding: 6px 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      #hud .hint .rest { display: none; }
+      #hud #palette:not([hidden]) ~ .hint { bottom: 148px; }
+    }
+    .icon-btn.q { font: 600 19px/1 var(--display); color: var(--ink); }
 
     /* to-do list (after Hozy's task book) */
     #hud .tasks { position: absolute; left: 16px; top: 88px; width: 272px; border-radius: 16px; padding: 12px 14px 12px; }
@@ -370,6 +400,7 @@
   <div id="hud" class="screen">
     <div class="loc glass"><div class="name" id="locName"></div><div class="room" id="locRoom"></div></div>
     <div class="tr">
+      <button class="icon-btn q" id="hudHelp" data-i18n-title="hud.help" data-i18n-aria="hud.help">?</button>
       <button class="icon-btn" id="hudPhoto" data-i18n-title="hud.photo" data-i18n-aria="hud.photo">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-2.5h6L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
       </button>
@@ -415,6 +446,7 @@
       <button class="btn" id="pPhoto" data-i18n="pause.photo"></button>
       <button class="btn" id="pAlbum" data-i18n="pause.album"></button>
       <button class="btn" id="pSettings" data-i18n="menu.settings"></button>
+      <button class="btn" id="pHelp" data-i18n="help.title"></button>
       <button class="btn" id="pMenu" data-i18n="pause.menu"></button>
     </div>
     <p class="note" data-i18n="pause.saved"></p>
@@ -448,6 +480,19 @@
     <h4 data-i18n="credits.fonts"></h4>
     <p>IBM Plex Sans Thai · Mali (SIL Open Font License)</p>
     <div class="row"><button class="btn primary" id="creditsClose" data-i18n="menu.close"></button></div>
+  </div></div>
+
+  <!-- how to play (ui/help.js): the controls sheet (? / H / pause) and the first-time welcome card -->
+  <div class="modal-wrap" id="helpWrap"><div class="modal help">
+    <h3 data-i18n="help.title"></h3>
+    <div class="cols" id="helpCols"></div>
+    <div class="row"><span class="foot" data-i18n="help.foot"></span><button class="btn primary" id="helpClose" data-i18n="menu.close"></button></div>
+  </div></div>
+
+  <div class="modal-wrap" id="welcomeWrap"><div class="modal welcome">
+    <h3 id="welcomeTitle"></h3>
+    <ol id="welcomeSteps"></ol>
+    <div class="row"><span class="foot" id="welcomeKeys"></span><button class="btn primary" id="welcomeGo" data-i18n="welcome.go"></button></div>
   </div></div>
 
   <div class="modal-wrap" id="confirmWrap"><div class="modal">

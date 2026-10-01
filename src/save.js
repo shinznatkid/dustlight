@@ -8,7 +8,8 @@ const KEY = 'hearthlight.v1';
 const DEFAULTS = {
   // medium by default: "high" supersamples, which a big window can't always afford
   // daycycle: 'auto' = the day goes round by itself once a room is repaired · 'stop' = it stays
-  settings: { lang: null, music: 0.7, ambience: 0.6, sfx: 0.8, quality: 'medium', showFps: false, daycycle: 'auto', debug: false },
+  // welcomed: the first-time welcome card (ui/help.js) has been shown
+  settings: { lang: null, music: 0.7, ambience: 0.6, sfx: 0.8, quality: 'medium', showFps: false, daycycle: 'auto', debug: false, welcomed: false },
   levels: {},
 };
 

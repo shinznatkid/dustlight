@@ -2,14 +2,17 @@ import { t } from '../i18n.js';
 import { $ } from './dom.js';
 
 // The modals over the game — pause, settings (its controls: settings.js), credits,
-// confirm, the before / after (reveal.js) — stacked: settings opened from pause closes
+// confirm, the before / after (reveal.js), how to play and the welcome card (help.js) — stacked: settings opened from pause closes
 // back onto pause. Esc or a click outside closes the top one (not a confirm, nor the
 // before / after, which has its own ways out).
 export function setupModals(app) {
   const { audio } = app;
 
   // ---- modals --------------------------------------------------------------------------------
-  const MODALS = { pause: 'pauseWrap', settings: 'settingsWrap', credits: 'creditsWrap', confirm: 'confirmWrap', reveal: 'revealWrap' };
+  const MODALS = {
+    pause: 'pauseWrap', settings: 'settingsWrap', credits: 'creditsWrap', confirm: 'confirmWrap', reveal: 'revealWrap',
+    help: 'helpWrap', welcome: 'welcomeWrap', // (ui/help.js)
+  };
   let modalStack = [];
   function openModal(name) {
     if (name === 'pause') {

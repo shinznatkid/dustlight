@@ -16,6 +16,7 @@ import { setupAutosave } from './ui/autosave.js';
 import { setupCues } from './ui/cues.js';
 import { setupMenu } from './ui/menu.js';
 import { setupModals } from './ui/modals.js';
+import { setupHelp } from './ui/help.js';
 import { setupSettings } from './ui/settings.js';
 import { setupPhoto } from './ui/photo.js';
 import { setupTimeflow } from './ui/timeflow.js';
@@ -156,7 +157,7 @@ world.onFrame((dt) => {
 
 // the screens (their frame hooks after the level's update: audio → the fps badge and the
 // debug corner → the time of day)
-for (const setup of [setupAutosave, setupCues, setupMenu, setupModals, setupSettings, setupPhoto,
+for (const setup of [setupAutosave, setupCues, setupMenu, setupModals, setupHelp, setupSettings, setupPhoto,
   setupTimeflow, setupReveal, setupAlbum, setupDev, setupTimelapse]) Object.assign(app, setup(app));
 
 // ---- boot ------------------------------------------------------------------------------------------
@@ -353,4 +354,6 @@ window.__app = {
   enterPlay, enterMenu, enterPhoto, reveal, snapshot, captureBefore, keepRoom, album,
   playTimelapse, revealTimelapse, viewAlbumRoom, get replay() { return app.replay; },
   get viewing() { return app.viewing; },
+  get modal() { return app.modal; },
+  get fly() { return app.fly; },
 };
