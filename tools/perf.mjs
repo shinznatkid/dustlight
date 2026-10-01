@@ -5,7 +5,7 @@
 // captures, time-of-day steps, saves, long tasks — and each phase reports its frame
 // times plus the worst frames and what they had in common.
 // Usage: node tools/perf.mjs [--level=cabin] [--port=5190] [--dwell=s] [--only=roller,squeegee] [--phase=unpack [--items=12]] [--w=1600] [--h=900] [--q=extra&flags]
-//        [--json=shots/perf.json]    (Edge on the real GPU, no window — --headful to watch)
+//        [--json=shots/perf.json] [--trace=.tmp/perf-trace.json]    (Edge on the real GPU, no window — --headful to watch)
 import './lowprio.mjs'; // below-normal priority for this and the browser it opens
 import puppeteer from 'puppeteer-core';
 import fs from 'node:fs';
@@ -250,6 +250,13 @@ try {
   const TOOLS = BY_LEVEL[LEVEL] ?? {};
   const order = Object.keys(TOOLS).filter((t) => !only || only.includes(t));
 
+  // --trace=<file>: a Chrome trace of the measured phases (open in DevTools → Performance);
+  // the "perf:sync" user-timing mark ties its clock to the frames' ts in --json
+  const TRACE = opt('trace', '');
+  if (TRACE) {
+    await page.tracing.start({ path: TRACE, categories: ['devtools.timeline', 'disabled-by-default-devtools.timeline.frame', 'blink.user_timing', 'disabled-by-default-v8.gc', 'v8.execute'] });
+    console.log('trace sync', await page.evaluate(() => { performance.mark('perf:sync'); return performance.now(); }));
+  }
   await label('idle');
   await sleep(3000);
   // --phase=unpack: take things out of the boxes one by one and put each where the
@@ -323,6 +330,7 @@ try {
   }
   await label('end');
   await sleep(200);
+  if (TRACE) await page.tracing.stop();
 
   const data = await page.evaluate(() => ({
     frames: [...window.__perf.frames.values()].sort((a, b) => a.ts - b.ts),

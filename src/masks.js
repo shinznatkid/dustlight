@@ -32,8 +32,11 @@ export function createMask(w, h, { valid = null, srgb = true, flipY = true } = {
   const ok = valid ?? new Uint8Array(w * h).fill(1);
   const total = ok.reduce((a, b) => a + b, 0) || 1;
   let dirty = false;
-  let version = 0; // bumps on every change; coverage is cached per version
+  let version = 0; // bumps on every change; coverage and the saved PNG are cached per version
   const cache = new Map();
+  // the last PNG made for a save: a save re-encodes only the masks that changed since
+  // (encoding every mask took ~15 ms of main thread per save — a hitch mid-stroke)
+  let png = null;
   const touch = () => {
     dirty = true;
     version++;
@@ -190,7 +193,10 @@ export function createMask(w, h, { valid = null, srgb = true, flipY = true } = {
       dirty = false;
       return true;
     },
-    toDataURL: () => (live() ? fade.to : canvas).toDataURL('image/png'),
+    toDataURL() {
+      if (png?.v !== version) png = { v: version, url: (live() ? fade.to : canvas).toDataURL('image/png') };
+      return png.url;
+    },
     get version() { return version; },
     // the mask as it is now (a canvas), to fade from later
     snapshot: copyOf,
