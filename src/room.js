@@ -51,6 +51,9 @@ export const SITES = {
 };
 
 const tl = new THREE.TextureLoader();
+// a map's file: WebP in a release build (vite.config.js), normal maps JPEG (tools/optimize_assets.mjs)
+const EXT = import.meta.env.TEXTURE_EXT ?? 'jpg';
+const file = (map) => `${map}.${map === 'nor' ? 'jpg' : EXT}`;
 const texCache = new Map();
 const pending = [];
 // resolves once every room texture (incl. the canvas-processed ones) is in memory
@@ -61,7 +64,7 @@ function tex(name, map, { srgb = false, size = 1 } = {}) {
   if (!t) {
     let done;
     pending.push(new Promise((r) => { done = r; }));
-    t = tl.load(`assets/textures/${name}/${map}.jpg`, done, undefined, done);
+    t = tl.load(`assets/textures/${name}/${file(map)}`, done, undefined, done);
     t.wrapS = t.wrapT = THREE.RepeatWrapping;
     t.anisotropy = 8;
     if (srgb) t.colorSpace = THREE.SRGBColorSpace;
@@ -105,7 +108,7 @@ function detailMap(name, size) {
     t.needsUpdate = true;
     done();
   };
-  img.src = `assets/textures/${name}/diff.jpg`;
+  img.src = `assets/textures/${name}/${file('diff')}`;
   return t;
 }
 

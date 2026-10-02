@@ -31,9 +31,15 @@ function manualChunks() {
   };
 }
 
-export default defineConfig({
+// a build whose assets go through tools/optimize_assets.mjs (below): not RAW_ASSETS=1, not `--mode check`
+const optimized = (command, mode) => command === 'build' && mode !== 'check' && !process.env.RAW_ASSETS;
+
+export default defineConfig(({ command, mode }) => ({
   base: './',
   server: { port: 5190, host: '127.0.0.1', strictPort: true },
+  // the rooms' standalone textures (room.js, rooms/bookshop/common.js): JPEG as fetched in
+  // dev, WebP once the asset pass has converted them
+  define: { 'import.meta.env.TEXTURE_EXT': JSON.stringify(optimized(command, mode) ? 'webp' : 'jpg') },
   build: {
     // main.js awaits a room module at the top level (?view=<sample>)
     target: 'es2022',
@@ -42,7 +48,7 @@ export default defineConfig({
     chunkSizeWarningLimit: 1200,
   },
   plugins: [releaseAssets()],
-});
+}));
 
 // after bundling: fail the build if a chunk imports the entry (tools/check_chunks.mjs),
 // then the shipped assets (the copy of public/assets in outDir; public/ is never touched):
@@ -63,7 +69,7 @@ function releaseAssets() {
       // (a URL, not a literal: Vite would bundle the tools into the config, away from their files)
       const tool = (f) => import(new URL(`./tools/${f}`, import.meta.url).href);
       (await tool('check_chunks.mjs')).checkChunks(outDir);
-      if (process.env.RAW_ASSETS || mode === 'check') return;
+      if (!optimized('build', mode)) return;
       await (await tool('optimize_assets.mjs')).optimizeAssets(outDir);
     },
   };

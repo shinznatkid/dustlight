@@ -9,6 +9,9 @@ import * as THREE from 'three';
 export const BASE = 'assets/rooms/bookshop/';
 
 const tl = new THREE.TextureLoader();
+// a map's file: WebP in a release build (vite.config.js), normal maps JPEG (tools/optimize_assets.mjs)
+const EXT = import.meta.env.TEXTURE_EXT ?? 'jpg';
+const file = (map) => `${map}.${map === 'nor' ? 'jpg' : EXT}`;
 const texCache = new Map();
 const pending = [];
 // resolves once every texture (incl. the canvas-processed ones) is in memory
@@ -26,7 +29,7 @@ export function tex(name, map, { srgb = false } = {}) {
   if (!t) {
     let done;
     track(new Promise((r) => { done = r; }));
-    t = tl.load(`${BASE}textures/${name}/${map}.jpg`, done, undefined, done);
+    t = tl.load(`${BASE}textures/${name}/${file(map)}`, done, undefined, done);
     t.wrapS = t.wrapT = THREE.RepeatWrapping;
     t.anisotropy = 8;
     if (srgb) t.colorSpace = THREE.SRGBColorSpace;
@@ -72,7 +75,7 @@ export function detailMap(name, amount = 0.6, clampTo = 0.1) {
     t.needsUpdate = true;
     done();
   };
-  img.src = `${BASE}textures/${name}/diff.jpg`;
+  img.src = `${BASE}textures/${name}/${file('diff')}`;
   return t;
 }
 

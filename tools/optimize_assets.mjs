@@ -13,9 +13,15 @@
 //    the audio index and the models (their buffers and images) are kept, plus the asset
 //    packs' license texts. That drops the sound board's candidates and download caches,
 //    zips, and stale files an older fetch left behind.
-// Standalone textures (assets/textures, rooms/bookshop/textures) keep their .jpg: the rooms
-// load them by that name (room.js, rooms/bookshop/common.js).
-// Idempotent: a model already carrying EXT_meshopt_compression is left alone.
+// 3. Standalone textures (assets/textures, rooms/bookshop/textures — the floors, walls and
+//    fabrics the rooms put on in code): colour, roughness and AO maps JPEG → WebP at the same
+//    quality (the rooms ask for one extension: import.meta.env.TEXTURE_EXT, set by
+//    vite.config.js for a build that runs this pass), and the manifests list the new names.
+//    Normal maps stay JPEG: lossy WebP subsamples the chroma again, which blurs the normals'
+//    per-pixel tilt — the sun's sparkle on the floors changed, and with it the bounce light
+//    (shaded corners 4–6% darker or brighter, at quality 90 as at 98; 2026-10-02).
+// Idempotent: a model already carrying EXT_meshopt_compression is left alone; a texture
+// already in WebP has no JPEG left to convert.
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
@@ -186,13 +192,44 @@ export async function optimizeAssets(dist, { log = console.log } = {}) {
   const goneBytes = size(gone);
   for (const f of gone) fs.rmSync(f);
   for (const d of dirs) removeEmpty(d);
+  const tex = await standaloneWebp(A);
   const models1 = MODEL_DIRS.flatMap((d) => walk(path.join(A, d))).filter((f) => /\.(gltf|glb)$/i.test(f));
   const modelBytes1 = size(models1.flatMap((f) => [f, ...modelRefs(f)]));
-  const missing = [...keep].filter((f) => !fs.existsSync(f));
+  const missing = [...keep].filter((f) => !fs.existsSync(f) && !fs.existsSync(f.replace(/\.jpe?g$/i, '.webp')));
   for (const f of missing) log(`  optimize_assets: referenced but missing: ${path.relative(A, f)}`);
   log(`optimize_assets: ${done} models compressed (${webp} textures → WebP${skipped ? `, ${skipped} already done` : ''}): `
-    + `${MB(modelBytes0)} → ${MB(modelBytes1)} · ${gone.length} unused files removed (${MB(goneBytes)}) · `
+    + `${MB(modelBytes0)} → ${MB(modelBytes1)} · ${tex.n} room textures → WebP: ${MB(tex.before)} → ${MB(tex.after)} · `
+    + `${gone.length} unused files removed (${MB(goneBytes)}) · `
     + `assets ${MB(bytes0)} → ${MB(size(dirs.flatMap((d) => walk(d))))} · ${((performance.now() - t0) / 1000).toFixed(1)} s`);
+}
+
+// 3. (above) every JPEG a manifest lists as a texture, normal maps aside → WebP next to it,
+// the manifest updated
+const KEEP_JPEG = new Set(['nor']); // (the rooms know: room.js, rooms/bookshop/common.js)
+async function standaloneWebp(A) {
+  const r = { n: 0, before: 0, after: 0 };
+  for (const [man, base] of [['manifest.json', ''], ['rooms/bookshop/manifest.json', 'rooms/bookshop']]) {
+    const f = path.join(A, man);
+    if (!fs.existsSync(f)) continue;
+    const m = JSON.parse(fs.readFileSync(f, 'utf8'));
+    for (const [id, maps] of Object.entries(m.textures ?? {})) {
+      for (const [k, file] of Object.entries(maps)) {
+        if (!/\.jpe?g$/i.test(file) || KEEP_JPEG.has(k)) continue;
+        const p = path.join(A, base, 'textures', id, file);
+        if (!fs.existsSync(p)) continue;
+        const src = fs.readFileSync(p);
+        const out = await sharp(src).webp(WEBP).toBuffer();
+        maps[k] = file.replace(/\.jpe?g$/i, '.webp');
+        fs.writeFileSync(path.join(path.dirname(p), maps[k]), out);
+        fs.rmSync(p);
+        r.n++;
+        r.before += src.length;
+        r.after += out.length;
+      }
+    }
+    fs.writeFileSync(f, JSON.stringify(m, null, 1));
+  }
+  return r;
 }
 
 function removeEmpty(dir) {
