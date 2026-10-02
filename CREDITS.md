@@ -46,7 +46,9 @@ Much of each room (walls, pots, signs, the neon, the stained glass) is built in 
 
 ## Fonts
 
-IBM Plex Sans Thai and Mali, both under the SIL Open Font License, served by Google Fonts.
+IBM Plex Sans Thai and Mali, both under the [SIL Open Font License](https://openfontlicense.org)
+(the license texts ship next to the font files). `tools/fetch_fonts.py` downloads them from
+Google Fonts and the game serves them itself.
 
 ## Inspiration
 

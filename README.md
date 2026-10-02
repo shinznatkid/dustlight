@@ -37,13 +37,13 @@ Needs Node.js 20.19+ and Python 3 (standard library only, used to download the a
 
 ```sh
 npm ci
-npm run assets   # once: downloads the models, textures, music and sounds into public/assets/ (not in git)
+npm run assets   # once: downloads the models, textures, music, sounds and fonts into public/assets/ (not in git)
 npm run dev      # http://127.0.0.1:5190/
 npm run check    # lint + a quick build (run before sending changes)
 npm run build    # the release build in dist/ (models compressed, only what the game loads)
 ```
 
-The models, textures and audio are CC0 / CC-BY works by other people, so the repository
+The models, textures, audio and fonts are works by other people (CC0, CC-BY, OFL), so the repository
 holds only the scripts that fetch them (`tools/fetch_*.py`).
 
 ## Project layout

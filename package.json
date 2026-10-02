@@ -11,7 +11,7 @@
     "lint": "eslint .",
     "check": "eslint . && vite build --mode check --outDir .tmp/check-build --emptyOutDir",
     "shot": "node tools/shot.mjs",
-    "assets": "python tools/fetch_assets.py && python tools/fetch_audio.py && python tools/fetch_room_cabin.py && python tools/fetch_room_bookshop.py && python tools/fetch_room_pottery.py && python tools/fetch_room_castle.py && python tools/fetch_room_cyber.py"
+    "assets": "python tools/fetch_assets.py && python tools/fetch_audio.py && python tools/fetch_room_cabin.py && python tools/fetch_room_bookshop.py && python tools/fetch_room_pottery.py && python tools/fetch_room_castle.py && python tools/fetch_room_cyber.py && python tools/fetch_fonts.py"
   },
   "dependencies": {
     "n8ao": "2.0.1",
