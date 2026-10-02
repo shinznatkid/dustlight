@@ -148,6 +148,7 @@ export class ShaftsPass extends Pass {
     this.sun = sun;
     this.strength = 0.007;
     this.on = true;
+    this.still = false; // ?still: the haze stops drifting too (world.js)
     const rtOpts = { type: THREE.HalfFloatType, depthBuffer: false, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter };
     this.rtA = new THREE.WebGLRenderTarget(1, 1, rtOpts);
     this.rtB = new THREE.WebGLRenderTarget(1, 1, rtOpts);
@@ -210,7 +211,7 @@ export class ShaftsPass extends Pass {
     u.projInv.value.copy(cam.projectionMatrixInverse);
     u.camWorld.value.copy(cam.matrixWorld);
     u.camPos.value.setFromMatrixPosition(cam.matrixWorld);
-    u.uTime.value += dt ?? 0.016;
+    if (!this.still) u.uTime.value += dt ?? 0.016;
     u.sunShadow.value = map ?? EMPTY_SHADOW;
     u.shadowMatrix.value.copy(sun.shadow.matrix);
     u.sunColor.value.copy(sun.color).multiplyScalar(sun.intensity);

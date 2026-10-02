@@ -395,8 +395,9 @@ export function createWorld(Q, R = meadow) {
   let fps = 0;
   let wasBusy = false;
   // ?still freezes everything that flickers or drifts (fire, candles, floating
-  // bricks, dust) so two screenshots of the same scene diff to ~zero
+  // bricks, dust, the shafts' haze) so two screenshots of the same scene diff to ~zero
   const STILL = Q.has('still');
+  post.shafts.still = STILL;
   function frame(ts) {
     timer.update(ts);
     const dt = Math.min(timer.getDelta(), 0.05);

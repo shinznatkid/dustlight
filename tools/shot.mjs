@@ -1,5 +1,5 @@
 // Screenshot the running dev server (http://127.0.0.1:5190) once GI has converged.
-// Usage: node tools/shot.mjs <name> [--q=t=0.62&cam=hero] [--w=1600] [--h=900] [--gpu] [--wait=ms]
+// Usage: node tools/shot.mjs <name> [--q=t=0.62&cam=hero] [--w=1600] [--h=900] [--gpu] [--wait=ms (800; 8000 with &still)]
 //        [--page=proto.html] [--port=5190]   (proto.html?room=<id> = one room on its own, src/rooms/)
 //   --gpu  Edge on the real GPU, headless (SwiftShader is far too slow for the probe GI) · --headful = show the window
 import './lowprio.mjs'; // below-normal priority for this and the browser it opens
@@ -42,7 +42,10 @@ try {
   const t0 = Date.now();
   await page.goto(`http://127.0.0.1:${opt('port', 5190)}/${opt('page', '')}?${q}${q ? '&' : ''}pr=1`, { waitUntil: 'load', timeout: 60000 });
   await page.waitForFunction('window.__ready === true', { timeout: +opt('timeout', 240000) });
-  const settle = +opt('wait', 800);
+  // the frame keeps settling for a few seconds after __ready (not the GI sweeps, the time of
+  // day nor the exposure — measured 2026-10-02): two &still shots 0.8 s in differ by a mean
+  // 0.2, 8 s in by 0 — so a comparison shot (&still) waits 8 s unless told otherwise
+  const settle = +opt('wait', /(^|&)still(&|$)/.test(q) ? 8000 : 800);
   await new Promise((r) => setTimeout(r, settle));
   const info = await page.evaluate(() => {
     const r = window.__app.renderer;
